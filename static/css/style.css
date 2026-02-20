@@ -1,0 +1,80 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(to right, #1e3c72, #2a5298);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Main Card */
+.chat-container {
+    width: 550px;
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0px 10px 30px rgba(0,0,0,0.2);
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Chat form */
+form {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+input {
+    flex: 1;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+}
+
+input[type="file"] {
+    background: #f7f7f7;
+}
+
+button {
+    padding: 12px 18px;
+    background: #2a5298;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    width: 100%;
+}
+
+button:hover {
+    background: #1e3c72;
+}
+
+/* Chat reply box */
+.bot-reply {
+    margin-top: 20px;
+    background: #f1f6ff;
+    padding: 15px;
+    border-radius: 10px;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.bot-reply p {
+    margin: 8px 0;
+}
+.success-message {
+    background: #d4edda;
+    color: #155724;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: bold;
+}
