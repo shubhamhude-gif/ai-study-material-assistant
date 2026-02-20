@@ -6,6 +6,29 @@ app = Flask(__name__)
 
 UPLOAD_FOLDER = "static/files"
 
+# ===== AUTO SETUP FOR RENDER =====
+# Create upload folder if not exists
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# Create database + table if not exists
+conn = sqlite3.connect("database.db")
+cursor = conn.cursor()
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS materials (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    subject TEXT,
+    type TEXT,
+    year TEXT,
+    file_name TEXT
+)
+""")
+
+conn.commit()
+conn.close()
+# ==================================
+
+
 # ================= HOME (CHATBOT) =================
 @app.route("/", methods=["GET", "POST"])
 def home():
@@ -66,14 +89,7 @@ def home():
                 [f"<a href='/static/files/{r[0]}' target='_blank'>{r[0]}</a>" for r in result]
             )
         else:
-            cursor.execute("SELECT DISTINCT subject, type FROM materials")
-            suggestions = cursor.fetchall()
-
-            suggestion_text = "<br>".join(
-                [f"{s[0]} {s[1]}" for s in suggestions]
-            )
-
-            response = "No material found.<br><br>Try these:<br>" + suggestion_text
+            response = "No material found."
 
         conn.close()
 
@@ -98,10 +114,11 @@ def admin():
         file = request.files["file"]
         filename = file.filename
 
-        # Save file to folder
-        file.save(os.path.join(UPLOAD_FOLDER, filename))
+        # Save file safely
+        file_path = os.path.join(UPLOAD_FOLDER, filename)
+        file.save(file_path)
 
-        # Save to database
+        # Save metadata to database
         conn = sqlite3.connect("database.db")
         cursor = conn.cursor()
 
