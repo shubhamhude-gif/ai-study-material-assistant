@@ -1,80 +1,87 @@
+/* ===== GLOBAL STYLE ===== */
 body {
+    margin: 0;
     font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(to right, #1e3c72, #2a5298);
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    margin: 0;
+    min-height: 100vh;
 }
 
-/* Main Card */
+/* ===== MAIN CARD ===== */
 .chat-container {
-    width: 550px;
-    background: white;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0px 10px 30px rgba(0,0,0,0.2);
+    width: 600px;
+    max-width: 90%;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.25);
 }
 
+/* ===== TITLES ===== */
 h2 {
     text-align: center;
     margin-bottom: 20px;
+    color: #1e3c72;
 }
 
-/* Chat form */
+/* ===== FORM ===== */
 form {
     display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 12px;
 }
 
 input {
-    flex: 1;
     padding: 12px;
-    border-radius: 8px;
     border: 1px solid #ccc;
-    margin-bottom: 10px;
+    border-radius: 8px;
+    font-size: 15px;
 }
 
-input[type="file"] {
-    background: #f7f7f7;
+input:focus {
+    outline: none;
+    border-color: #2a5298;
 }
 
+/* ===== BUTTON ===== */
 button {
-    padding: 12px 18px;
+    padding: 12px;
+    border: none;
     background: #2a5298;
     color: white;
-    border: none;
     border-radius: 8px;
-    cursor: pointer;
     font-weight: bold;
-    width: 100%;
+    cursor: pointer;
+    transition: 0.3s;
 }
 
 button:hover {
     background: #1e3c72;
 }
 
-/* Chat reply box */
+/* ===== CHAT BOX ===== */
 .bot-reply {
     margin-top: 20px;
-    background: #f1f6ff;
-    padding: 15px;
+    background: #f4f8ff;
     border-radius: 10px;
-    max-height: 250px;
+    padding: 15px;
+    max-height: 280px;
     overflow-y: auto;
 }
 
 .bot-reply p {
     margin: 8px 0;
 }
+
+/* ===== SUCCESS MESSAGE ===== */
 .success-message {
     background: #d4edda;
     color: #155724;
     padding: 10px;
     border-radius: 8px;
-    margin-bottom: 15px;
     text-align: center;
+    margin-bottom: 15px;
     font-weight: bold;
 }
