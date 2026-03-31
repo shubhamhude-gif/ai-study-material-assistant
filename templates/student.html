@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI Study Assistant — DBATU Academic Portal. Ask questions and find study materials instantly.">
+<script src="https://cdn.tailwindcss.com"></script>
+<title>AI Study Assistant — DBATU Academic Portal</title>
+<style>
+.material-card {
+    background: #f9fafb;
+    padding: 12px;
+    border-radius: 8px;
+    margin: 8px 0;
+    border-left: 4px solid #3b82f6;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+    color: white;
+    margin-right: 8px;
+}
+
+.badge-blue { background: #3b82f6; }
+.badge-orange { background: #f97316; }
+.badge-red { background: #ef4444; }
+.badge-purple { background: #a855f7; }
+.badge-gray { background: #6b7280; }
+
+.download-link {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.download-link:hover {
+    text-decoration: underline;
+}
+
+.ref-link {
+    color: #059669;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.ref-link:hover {
+    text-decoration: underline;
+}
+
+.status-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+    margin-right: 6px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.typing-indicator {
+    display: none;
+    padding: 10px 15px;
+    background: white;
+    border-radius: 20px;
+    width: fit-content;
+}
+
+.typing-indicator span {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #6b7280;
+    border-radius: 50%;
+    margin: 0 2px;
+    animation: typing 1.4s infinite;
+}
+
+.typing-indicator span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typing {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-10px); }
+}
+</style>
+</head>
+
+<body class="bg-gray-100">
+
+<!-- ===== UNIVERSITY HEADER ===== -->
+<header class="bg-[#0f2742] text-white py-3 px-6 flex justify-between items-center shadow">
+    <div class="flex items-center gap-3">
+        <img src="{{ url_for('static', filename='images/dbatulogo.jpg') }}" class="w-10 h-10 rounded" alt="DBATU Logo">
+        <div>
+            <h1 class="font-bold text-lg">Dr. Babasaheb Ambedkar Technological University</h1>
+            <p class="text-sm text-gray-300">Department of Information Technology</p>
+        </div>
+    </div>
+
+    <nav class="text-sm" aria-label="Main navigation">
+        <span aria-label="AI assistant status">
+            <span class="status-indicator" aria-hidden="true"></span>
+            <span class="text-green-300 text-xs">Assistant Online</span>
+        </span>
+        <span class="text-gray-400 mx-2">|</span>
+        <span>{{ name }}</span>
+        <span class="text-gray-400 mx-2">|</span>
+        <a href="/dashboard" class="text-blue-300 hover:text-blue-100">Dashboard</a>
+        <span class="text-gray-400 mx-2">|</span>
+        <a href="/browse" class="text-blue-300 hover:text-blue-100">Browse Materials</a>
+        <span class="text-gray-400 mx-2">|</span>
+        <a href="/logout" class="text-red-300 hover:text-red-100">Sign Out</a>
+    </nav>
+</header>
+
+
+<!-- ===== CHATBOT ===== -->
+<main class="max-w-4xl mx-auto mt-6 bg-white shadow-xl rounded-xl flex flex-col h-[82vh]" aria-label="AI Study Assistant">
+
+    <!-- TITLE -->
+    <div class="p-5 border-b bg-gray-50 rounded-t-xl">
+        <h2 class="text-2xl font-bold text-[#123a63] text-center" id="chat-heading">
+            🤖 DBATU AI Study Assistant
+        </h2>
+        <p class="text-center text-gray-600 mt-1">
+            Ask a question, search for materials, or find previous year questions — powered by AI.
+        </p>
+    </div>
+
+    <!-- CHAT MESSAGES -->
+    <div id="chatBox" class="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50" role="log" aria-live="polite" aria-label="Conversation history">
+
+        {% for m,r in chats %}
+
+        <!-- USER MESSAGE -->
+        <div class="flex justify-end" role="article" aria-label="Your message">
+            <div class="bg-blue-600 text-white px-4 py-3 rounded-2xl shadow max-w-[70%]">
+                {{ m }}
+            </div>
+        </div>
+
+        <!-- AI RESPONSE -->
+        <div class="flex justify-start" role="article" aria-label="Assistant response">
+            <div class="bg-white border px-4 py-3 rounded-2xl shadow max-w-[70%]">
+                {{ r|safe }}
+            </div>
+        </div>
+
+        {% endfor %}
+
+        <!-- TYPING INDICATOR -->
+        <div class="flex justify-start" aria-live="polite" aria-label="Assistant is typing">
+            <div id="typingIndicator" class="typing-indicator" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- INPUT -->
+    <form id="chatForm" method="POST" class="p-4 border-t bg-white flex gap-3 rounded-b-xl" aria-label="Send a message">
+
+        <label for="messageInput" class="sr-only">Type your question or search query</label>
+        <input id="messageInput" name="message"
+               class="flex-1 border rounded-full px-5 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+               placeholder="Ask about a topic, unit, or subject…" required
+               autocomplete="off"
+               aria-label="Type your question">
+
+        <button type="submit"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-6 rounded-full font-semibold shadow transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+            Send
+        </button>
+
+    </form>
+
+</main>
+
+<script>
+// Show typing animation on form submit
+document.getElementById('chatForm').addEventListener('submit', function() {
+    document.getElementById('typingIndicator').style.display = 'block';
+    document.getElementById('typingIndicator').setAttribute('aria-hidden', 'false');
+    document.getElementById('messageInput').disabled = true;
+});
+
+// Auto-scroll to the latest message
+const chatBox = document.getElementById('chatBox');
+chatBox.scrollTop = chatBox.scrollHeight;
+</script>
+
+</body>
+</html>

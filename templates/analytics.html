@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Usage Analytics — DBATU Academic Portal. Track material downloads and student search activity.">
+<script src="https://cdn.tailwindcss.com"></script>
+<title>Usage Analytics — DBATU Academic Portal</title>
+</head>
+
+<body class="bg-gray-100">
+
+<!-- HEADER -->
+<header class="bg-[#0f2742] text-white py-3 px-6 flex justify-between items-center shadow">
+    <div class="flex items-center gap-3">
+        <img src="{{ url_for('static', filename='images/dbatulogo.jpg') }}" class="w-10 h-10 rounded" alt="DBATU Logo">
+        <div>
+            <h1 class="font-bold text-lg">DBATU Academic Portal</h1>
+            <p class="text-sm text-gray-300">Faculty Portal — Usage Analytics</p>
+        </div>
+    </div>
+
+    <nav class="text-sm" aria-label="Faculty navigation">
+        <span>{{ name }}</span>
+        <span class="text-gray-400 mx-2">|</span>
+        <a href="/admin" class="text-blue-300 hover:text-blue-100">Material Management</a>
+        <span class="text-gray-400 mx-2">|</span>
+        <a href="/logout" class="text-red-300 hover:text-red-100">Sign Out</a>
+    </nav>
+</header>
+
+<!-- MAIN CONTENT -->
+<main class="max-w-6xl mx-auto mt-8 p-6">
+
+    <h2 class="text-3xl font-bold text-[#123a63] mb-6">📊 Usage Analytics</h2>
+
+    <div class="grid md:grid-cols-2 gap-6">
+
+        <!-- MOST DOWNLOADED MATERIALS -->
+        <section class="bg-white p-6 rounded-xl shadow" aria-label="Most downloaded materials">
+            <h3 class="text-xl font-bold text-blue-700 mb-4">📥 Most Downloaded Materials</h3>
+
+            {% if most_downloaded %}
+            <ol class="space-y-3" aria-label="Top downloaded materials list">
+                {% for item in most_downloaded %}
+                <li class="border-l-4 border-blue-500 pl-4 py-2">
+                    <p class="font-semibold">{{ item[0] }} — {{ item[1] }}</p>
+                    <p class="text-sm text-gray-600">
+                        Type: {{ item[2] }}
+                        &nbsp;·&nbsp;
+                        <strong>{{ item[3] }}</strong> download{% if item[3] != 1 %}s{% endif %}
+                    </p>
+                </li>
+                {% endfor %}
+            </ol>
+            {% else %}
+            <p class="text-gray-500">No download activity recorded yet. Encourage students to explore the material library.</p>
+            {% endif %}
+        </section>
+
+        <!-- MOST SEARCHED QUESTIONS -->
+        <section class="bg-white p-6 rounded-xl shadow" aria-label="Most searched questions">
+            <h3 class="text-xl font-bold text-green-700 mb-4">🔍 Most Searched Queries</h3>
+
+            {% if most_searched %}
+            <ol class="space-y-3" aria-label="Top searched queries list">
+                {% for item in most_searched %}
+                <li class="border-l-4 border-green-500 pl-4 py-2">
+                    <p class="font-semibold">{{ item[0] }}</p>
+                    <p class="text-sm text-gray-600">
+                        Searched <strong>{{ item[1] }}</strong> time{% if item[1] != 1 %}s{% endif %}
+                    </p>
+                </li>
+                {% endfor %}
+            </ol>
+            {% else %}
+            <p class="text-gray-500">No search data recorded yet. Data will appear as students use the AI assistant.</p>
+            {% endif %}
+        </section>
+
+    </div>
+
+</main>
+
+</body>
+</html>

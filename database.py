@@ -3,21 +3,83 @@ import sqlite3
 conn = sqlite3.connect("database.db")
 cursor = conn.cursor()
 
-# Create table only
+# Updated materials table with new fields
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS materials (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    subject TEXT NOT NULL,
-    type TEXT NOT NULL,
-    year TEXT NOT NULL,
-    file_name TEXT NOT NULL
+    subject TEXT,
+    semester TEXT,
+    unit_number TEXT,
+    unit_name TEXT,
+    material_type TEXT,
+    filename TEXT,
+    reference_url TEXT,
+    academic_year TEXT,
+    uploaded_on TEXT
 )
 """)
 
-# Clear old data
-cursor.execute("DELETE FROM materials")
+# QA Mapping table for common questions
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS qa_mapping (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    question TEXT,
+    subject TEXT,
+    unit_number TEXT,
+    material_id INTEGER,
+    FOREIGN KEY (material_id) REFERENCES materials(id)
+)
+""")
+
+# Updated users table
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    full_name TEXT,
+    role TEXT,
+    username TEXT UNIQUE,
+    password TEXT,
+    prn TEXT,
+    year TEXT,
+    subject TEXT
+)
+""")
+
+# Chats table
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS chats (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT,
+    message TEXT,
+    response TEXT,
+    time TEXT
+)
+""")
+
+# Bookmarks table
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS bookmarks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT,
+    material_id INTEGER,
+    bookmarked_on TEXT,
+    FOREIGN KEY (material_id) REFERENCES materials(id)
+)
+""")
+
+# Analytics table
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS analytics (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    material_id INTEGER,
+    action_type TEXT,
+    username TEXT,
+    timestamp TEXT,
+    FOREIGN KEY (material_id) REFERENCES materials(id)
+)
+""")
 
 conn.commit()
 conn.close()
 
-print("Empty database created successfully!")
+print("Database ready with all tables.")

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Sign in to DBATU Academic Portal — Access AI-powered study materials, assignments, and academic resources.">
+<script src="https://cdn.tailwindcss.com"></script>
+<title>Sign In — DBATU Academic Portal</title>
+<style>
+.step-indicator {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.step-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #d1d5db;
+    transition: background 0.3s ease;
+}
+.step-dot.active {
+    background: #0f2742;
+}
+.form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 6px;
+}
+.input-hint {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 4px;
+}
+.loading-text {
+    display: none;
+}
+.loading .loading-text {
+    display: inline;
+}
+.loading .normal-text {
+    display: none;
+}
+.required-mark {
+    color: #ef4444;
+    margin-left: 2px;
+}
+</style>
+</head>
+
+<body class="bg-gray-100">
+
+<!-- TOP STRIP -->
+<div class="bg-[#0f2742] text-white text-center py-3 font-semibold" role="banner">
+    Dr. Babasaheb Ambedkar Technological University &nbsp;|&nbsp; Academic Portal
+</div>
+
+<div class="min-h-screen flex items-center justify-center p-6">
+
+<div class="w-full max-w-5xl bg-white shadow-2xl rounded-xl grid md:grid-cols-2" role="main">
+
+<!-- LEFT PANEL -->
+<div class="p-10 bg-gray-50 rounded-l-xl">
+    <img src="{{ url_for('static', filename='images/dbatulogo.jpg') }}"
+         alt="DBATU University Logo"
+         class="w-24 mb-4">
+
+    <h1 class="text-3xl font-bold text-[#123a63] leading-tight">
+        DBATU Academic Portal
+    </h1>
+
+    <p class="text-gray-600 mt-3 leading-relaxed">
+        Secure access to study materials, AI-powered academic assistance, and departmental resources for students and faculty members.
+    </p>
+
+    <div class="mt-6 text-sm text-gray-500" aria-label="Portal features">
+        <p class="mb-2">✓ AI-Powered Study Assistant</p>
+        <p class="mb-2">✓ Comprehensive Material Library</p>
+        <p class="mb-2">✓ Department of Information Technology</p>
+    </div>
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="p-10">
+
+    <h2 class="text-2xl font-bold text-[#123a63] mb-2" id="form-heading">
+        {% if step == '2' %}Complete Your Profile{% else %}Welcome Back{% endif %}
+    </h2>
+
+    <p class="text-gray-600 text-sm mb-5">
+        {% if step == '2' %}
+        Please provide the following details to complete your account setup.
+        {% else %}
+        Sign in to your account or create a new one to get started.
+        {% endif %}
+    </p>
+
+    <!-- STEP INDICATOR -->
+    <div class="step-indicator" role="progressbar" aria-valuenow="{% if step == '2' %}2{% else %}1{% endif %}" aria-valuemin="1" aria-valuemax="2" aria-label="Registration step {% if step == '2' %}2{% else %}1{% endif %} of 2">
+        <div class="step-dot {% if step != '2' %}active{% endif %}" title="Step 1: Credentials"></div>
+        <div class="step-dot {% if step == '2' %}active{% endif %}" title="Step 2: Profile Information"></div>
+    </div>
+
+    {% if step == '2' %}
+    <!-- STEP 2 FORM — Profile Information -->
+    <form method="POST" class="space-y-4" id="authForm" novalidate aria-labelledby="form-heading">
+
+        <div>
+            <label class="form-label" for="full_name">
+                Full Name <span class="required-mark" aria-hidden="true">*</span>
+            </label>
+            <input id="full_name" name="full_name" type="text"
+                   placeholder="e.g., Rahul Sharma" required
+                   autocomplete="name"
+                   aria-required="true"
+                   aria-describedby="full_name_hint"
+                   class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <p id="full_name_hint" class="input-hint">Enter your full legal name as per university records.</p>
+        </div>
+
+        {% if temp_role == 'student' %}
+        <div>
+            <label class="form-label" for="prn">
+                PRN Number <span class="required-mark" aria-hidden="true">*</span>
+            </label>
+            <input id="prn" name="prn" type="text"
+                   placeholder="e.g., 2024001234" required
+                   autocomplete="off"
+                   aria-required="true"
+                   aria-describedby="prn_hint"
+                   class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <p id="prn_hint" class="input-hint">Your Permanent Registration Number issued by the university.</p>
+        </div>
+
+        <div>
+            <label class="form-label" for="year">
+                Current Academic Year <span class="required-mark" aria-hidden="true">*</span>
+            </label>
+            <select id="year" name="year" required
+                    aria-required="true"
+                    class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <option value="">— Select your current year —</option>
+                <option value="FE">First Year (FE)</option>
+                <option value="SE">Second Year (SE)</option>
+                <option value="TE">Third Year (TE)</option>
+                <option value="BE">Final Year (BE)</option>
+            </select>
+        </div>
+        {% endif %}
+
+        {% if temp_role == 'professor' %}
+        <div>
+            <label class="form-label" for="subject">
+                Primary Subject Area <span class="required-mark" aria-hidden="true">*</span>
+            </label>
+            <input id="subject" name="subject" type="text"
+                   placeholder="e.g., Data Structures, Computer Networks" required
+                   autocomplete="off"
+                   aria-required="true"
+                   aria-describedby="subject_hint"
+                   class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <p id="subject_hint" class="input-hint">The subject you primarily teach or manage materials for.</p>
+        </div>
+        {% endif %}
+
+        <div class="flex gap-3 pt-2">
+            <button type="submit" name="action"
+                    value="{% if temp_action == 'login_step1' %}login_step2{% else %}register_step2{% endif %}"
+                    id="submitBtn"
+                    class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-semibold transition duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                <span class="normal-text">{% if temp_action == 'login_step1' %}Complete Sign In{% else %}Create Account{% endif %}</span>
+                <span class="loading-text">Processing, please wait…</span>
+            </button>
+
+            <a href="/"
+               class="w-full bg-gray-400 text-white py-3 rounded-lg hover:bg-gray-500 text-center font-semibold transition duration-200 shadow-sm flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+               aria-label="Go back to Step 1">
+                Go Back
+            </a>
+        </div>
+
+    </form>
+
+    {% else %}
+    <!-- STEP 1 FORM — Credentials -->
+    <form method="POST" class="space-y-4" id="authForm" novalidate aria-labelledby="form-heading">
+
+        <div>
+            <label class="form-label" for="role">
+                I am a <span class="required-mark" aria-hidden="true">*</span>
+            </label>
+            <select id="role" name="role" required
+                    aria-required="true"
+                    aria-describedby="role_hint"
+                    class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <option value="">— Select your role —</option>
+                <option value="student">Student</option>
+                <option value="professor">Faculty Member</option>
+            </select>
+            <p id="role_hint" class="input-hint">Select the role that best describes your affiliation.</p>
+        </div>
+
+        <div>
+            <label class="form-label" for="username">
+                Username <span class="required-mark" aria-hidden="true">*</span>
+            </label>
+            <input id="username" name="username" type="text"
+                   placeholder="Enter your username" required
+                   autocomplete="username"
+                   aria-required="true"
+                   aria-describedby="username_hint"
+                   class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <p id="username_hint" class="input-hint">Must be at least 3 characters. No spaces allowed.</p>
+        </div>
+
+        <div>
+            <label class="form-label" for="password">
+                Password <span class="required-mark" aria-hidden="true">*</span>
+            </label>
+            <input id="password" name="password" type="password"
+                   placeholder="Enter your password" required
+                   autocomplete="current-password"
+                   aria-required="true"
+                   aria-describedby="password_hint"
+                   class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <p id="password_hint" class="input-hint">Minimum 6 characters. Use a mix of letters and numbers for a stronger password.</p>
+        </div>
+
+        <div class="flex gap-3 pt-2">
+            <button type="submit" name="action" value="login_step1" id="signInBtn"
+                    class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-semibold transition duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                <span class="normal-text">Sign In</span>
+                <span class="loading-text">Signing in…</span>
+            </button>
+
+            <button type="submit" name="action" value="register_step1" id="registerBtn"
+                    class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-semibold transition duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                <span class="normal-text">Create Account</span>
+                <span class="loading-text">Setting up…</span>
+            </button>
+        </div>
+
+    </form>
+    {% endif %}
+
+    {% if error %}
+    <div role="alert"
+         class="mt-4 p-3 rounded-lg {% if 'successfully' in error.lower() or 'success' in error.lower() %}bg-green-50 border border-green-200{% else %}bg-red-50 border border-red-200{% endif %}">
+        <p class="{% if 'successfully' in error.lower() or 'success' in error.lower() %}text-green-700{% else %}text-red-700{% endif %} text-sm font-medium">
+            {% if 'successfully' in error.lower() or 'success' in error.lower() %}
+                ✓ {{ error }}
+            {% else %}
+                ⚠ {{ error }}
+            {% endif %}
+        </p>
+    </div>
+    {% endif %}
+
+    <p class="text-center text-xs text-gray-500 mt-6">
+        By continuing, you agree to DBATU's academic policies and terms of use.
+    </p>
+
+</div>
+</div>
+</div>
+
+<script>
+// Add loading state on form submit — highlights the clicked button only
+document.getElementById('authForm').addEventListener('submit', function(e) {
+    const clickedBtn = e.submitter;
+    if (clickedBtn) {
+        clickedBtn.classList.add('loading');
+        clickedBtn.disabled = true;
+        // Re-enable after 8 seconds as a safety fallback
+        setTimeout(() => {
+            clickedBtn.classList.remove('loading');
+            clickedBtn.disabled = false;
+        }, 8000);
+    }
+});
+
+// Basic client-side validation feedback
+const usernameInput = document.getElementById('username');
+const passwordInput = document.getElementById('password');
+
+if (usernameInput) {
+    usernameInput.addEventListener('blur', function() {
+        if (this.value && this.value.length < 3) {
+            this.classList.add('border-red-400');
+            this.classList.remove('border-gray-300');
+        } else {
+            this.classList.remove('border-red-400');
+            this.classList.add('border-gray-300');
+        }
+    });
+}
+
+if (passwordInput) {
+    passwordInput.addEventListener('blur', function() {
+        if (this.value && this.value.length < 6) {
+            this.classList.add('border-red-400');
+            this.classList.remove('border-gray-300');
+        } else {
+            this.classList.remove('border-red-400');
+            this.classList.add('border-gray-300');
+        }
+    });
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Student Dashboard — DBATU Academic Portal. View study materials, access the AI assistant, and browse resources.">
+<script src="https://cdn.tailwindcss.com"></script>
+<title>Student Dashboard — DBATU Academic Portal</title>
+</head>
+
+<body class="bg-gray-100">
+
+<!-- ===== UNIVERSITY HEADER ===== -->
+<header class="bg-[#0f2742] text-white py-3 px-6 flex justify-between items-center shadow">
+    <div class="flex items-center gap-3">
+        <img src="{{ url_for('static', filename='images/dbatulogo.jpg') }}" class="w-10 h-10 rounded" alt="DBATU Logo">
+        <div>
+            <h1 class="font-bold text-lg">Dr. Babasaheb Ambedkar Technological University</h1>
+            <p class="text-sm text-gray-300">Department of Information Technology</p>
+        </div>
+    </div>
+
+    <nav class="text-sm" aria-label="Main navigation">
+        <span class="mr-2">{{ name }}</span>
+        <span class="text-gray-400">|</span>
+        <a href="/logout" class="text-red-300 hover:text-red-100 ml-2">Sign Out</a>
+    </nav>
+</header>
+
+<!-- MAIN CONTENT -->
+<main class="max-w-6xl mx-auto mt-8 p-6">
+
+    <h2 class="text-3xl font-bold text-[#123a63] mb-6">Welcome, {{ name }}!</h2>
+
+    <!-- STATS CARDS -->
+    <section class="grid md:grid-cols-3 gap-6 mb-8" aria-label="Academic overview">
+
+        <div class="bg-white p-6 rounded-xl shadow-lg">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm">Study Materials Available</p>
+                    <p class="text-4xl font-bold text-blue-600 mt-2">{{ total_materials }}</p>
+                </div>
+                <div class="text-5xl" aria-hidden="true">📚</div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-lg">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm">Subjects Available</p>
+                    <p class="text-4xl font-bold text-green-600 mt-2">{{ total_subjects }}</p>
+                </div>
+                <div class="text-5xl" aria-hidden="true">📖</div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-lg">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-sm">Recently Added (Last 7 Days)</p>
+                    <p class="text-4xl font-bold text-purple-600 mt-2">{{ recent_materials }}</p>
+                </div>
+                <div class="text-5xl" aria-hidden="true">🆕</div>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- ACTION BUTTONS -->
+    <section class="grid md:grid-cols-2 gap-6" aria-label="Quick actions">
+
+        <a href="/student" class="bg-blue-600 hover:bg-blue-700 text-white p-8 rounded-xl shadow-lg text-center block transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+            <div class="text-5xl mb-3" aria-hidden="true">💬</div>
+            <h2 class="text-2xl font-bold">AI Study Assistant</h2>
+            <p class="text-sm mt-2 opacity-90">Ask questions and find study materials instantly</p>
+        </a>
+
+        <a href="/browse" class="bg-green-600 hover:bg-green-700 text-white p-8 rounded-xl shadow-lg text-center block transition duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+            <div class="text-5xl mb-3" aria-hidden="true">🔍</div>
+            <h2 class="text-2xl font-bold">Browse Materials</h2>
+            <p class="text-sm mt-2 opacity-90">Filter and explore all available academic resources</p>
+        </a>
+
+    </section>
+
+</main>
+
+</body>
+</html>

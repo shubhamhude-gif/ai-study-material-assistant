@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Browse Study Materials — DBATU Academic Portal. Filter and download notes, assignments, PYQs, and reference materials.">
+<script src="https://cdn.tailwindcss.com"></script>
+<title>Browse Study Materials — DBATU Academic Portal</title>
+<style>
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+    color: white;
+    margin-right: 8px;
+}
+
+.badge-blue { background: #3b82f6; }
+.badge-orange { background: #f97316; }
+.badge-red { background: #ef4444; }
+.badge-purple { background: #a855f7; }
+.badge-gray { background: #6b7280; }
+
+.material-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.material-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.download-btn {
+    background: #2563eb;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.15s;
+}
+
+.download-btn:hover {
+    background: #1d4ed8;
+}
+
+.ref-btn {
+    background: #10b981;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.15s;
+}
+
+.ref-btn:hover {
+    background: #059669;
+}
+</style>
+</head>
+
+<body class="bg-gray-100">
+
+<!-- ===== UNIVERSITY HEADER ===== -->
+<header class="bg-[#0f2742] text-white py-3 px-6 flex justify-between items-center shadow">
+    <div class="flex items-center gap-3">
+        <img src="{{ url_for('static', filename='images/dbatulogo.jpg') }}" class="w-10 h-10 rounded" alt="DBATU Logo">
+        <div>
+            <h1 class="font-bold text-lg">Dr. Babasaheb Ambedkar Technological University</h1>
+            <p class="text-sm text-gray-300">Department of Information Technology</p>
+        </div>
+    </div>
+
+    <nav class="text-sm" aria-label="Main navigation">
+        <span>{{ name }}</span>
+        <span class="text-gray-400 mx-2">|</span>
+        <a href="/dashboard" class="text-blue-300 hover:text-blue-100">Dashboard</a>
+        <span class="text-gray-400 mx-2">|</span>
+        <a href="/student" class="text-blue-300 hover:text-blue-100">AI Assistant</a>
+        <span class="text-gray-400 mx-2">|</span>
+        <a href="/logout" class="text-red-300 hover:text-red-100">Sign Out</a>
+    </nav>
+</header>
+
+<!-- MAIN CONTENT -->
+<main class="max-w-6xl mx-auto mt-6 p-6">
+
+    <h2 class="text-3xl font-bold text-[#123a63] mb-6">📚 Browse Study Materials</h2>
+
+    <!-- FILTERS -->
+    <section class="bg-white p-6 rounded-xl shadow mb-6" aria-label="Filter materials">
+        <form method="GET" class="grid md:grid-cols-5 gap-3" role="search" aria-label="Filter study materials">
+
+            <div>
+                <label for="semester_filter" class="block text-xs font-medium text-gray-600 mb-1">Semester</label>
+                <select id="semester_filter" name="semester" class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Semesters</option>
+                    {% for sem in semesters %}
+                    <option value="{{ sem }}" {% if selected_semester == sem %}selected{% endif %}>
+                        Semester {{ sem }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label for="subject_filter" class="block text-xs font-medium text-gray-600 mb-1">Subject</label>
+                <select id="subject_filter" name="subject" class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Subjects</option>
+                    {% for subj in subjects %}
+                    <option value="{{ subj }}" {% if selected_subject == subj %}selected{% endif %}>
+                        {{ subj }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label for="unit_filter" class="block text-xs font-medium text-gray-600 mb-1">Unit Number</label>
+                <input id="unit_filter" name="unit" placeholder="e.g., 1, 2, 3" value="{{ selected_unit }}"
+                       class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div>
+                <label for="type_filter" class="block text-xs font-medium text-gray-600 mb-1">Material Type</label>
+                <select id="type_filter" name="material_type" class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Types</option>
+                    {% for typ in types %}
+                    <option value="{{ typ }}" {% if selected_type == typ %}selected{% endif %}>
+                        {{ typ }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="flex items-end">
+                <button type="submit"
+                        class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-semibold transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    Apply Filters
+                </button>
+            </div>
+
+        </form>
+    </section>
+
+    <!-- RESULTS -->
+    <section aria-label="Search results">
+
+        {% if materials %}
+        <p class="text-gray-600 mb-4">
+            Showing {{ materials|length }} result{% if materials|length != 1 %}s{% endif %}
+        </p>
+
+        {% for mat in materials %}
+        <article class="material-card mb-4">
+
+            <div class="flex justify-between items-start mb-3">
+                <div>
+                    <span class="badge badge-{% if mat[5] == 'NOTES' %}blue{% elif mat[5] == 'ASSIGNMENT' %}orange{% elif mat[5] == 'PYQ' %}red{% else %}purple{% endif %}"
+                          aria-label="Type: {{ mat[5] }}">
+                        {{ mat[5] }}
+                    </span>
+                    <span class="text-sm text-gray-600">Semester {{ mat[2] }} &nbsp;|&nbsp; Unit {{ mat[3] }}</span>
+                </div>
+                <span class="text-xs text-gray-500">{{ mat[8] }}</span>
+            </div>
+
+            <h3 class="text-xl font-bold text-[#123a63] mb-2">
+                {{ mat[1] }} — {{ mat[4] }}
+            </h3>
+
+            <div class="flex gap-3 mt-4">
+                {% if mat[6] %}
+                <a href="/download/{{ mat[0] }}" class="download-btn"
+                   aria-label="Download {{ mat[6] }}">
+                    📥 Download File
+                </a>
+                {% endif %}
+
+                {% if mat[7] %}
+                <a href="{{ mat[7] }}" target="_blank" rel="noopener noreferrer" class="ref-btn"
+                   aria-label="Open reference link (opens in a new tab)">
+                    🔗 Open Reference
+                </a>
+                {% endif %}
+            </div>
+
+        </article>
+        {% endfor %}
+
+        {% else %}
+        <div class="bg-white p-8 rounded-xl shadow text-center">
+            <p class="text-gray-600 text-lg">No materials matched your filters.</p>
+            <p class="text-gray-400 text-sm mt-2">Try adjusting or clearing your filters to see more results.</p>
+        </div>
+        {% endif %}
+
+    </section>
+
+</main>
+
+</body>
+</html>
