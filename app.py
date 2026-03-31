@@ -1,30 +1,38 @@
 from flask import Flask, render_template, request, redirect, session, send_from_directory, jsonify
-import sqlite3, os, random, datetime, logging
+from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
+from dotenv import load_dotenv
+import sqlite3
+import os
+import random
+import datetime
+import logging
+
+load_dotenv()
 
 # ===== LOGGING =====
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.WARNING,
     format="%(asctime)s [%(levelname)s] %(name)s — %(message)s",
     handlers=[
-        logging.FileHandler("app.log", encoding="utf-8"),
         logging.StreamHandler(),
     ],
 )
 log = logging.getLogger(__name__)
 
 app = Flask(__name__)
-app.secret_key = "dbatu_academic_portal_secret_2025"
+app.secret_key = os.getenv("SECRET_KEY", "default_secure_key_change_in_production")
 
 UPLOAD_FOLDER = "static/files"
 ALLOWED_EXTENSIONS = {'pdf', 'docx'}
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-# ===== DATABASE =====
+# ===== DATABASE INITIALIZATION =====
 def init_db():
     conn = sqlite3.connect("database.db")
     c = conn.cursor()
@@ -99,13 +107,14 @@ def init_db():
     )
     """)
 
-    # default admin
+    # Create default admin user with hashed password
     c.execute("SELECT * FROM users WHERE username='admin'")
     if not c.fetchone():
+        hashed_password = generate_password_hash("admin123")
         c.execute("""
         INSERT INTO users(full_name,role,username,password)
-        VALUES('Admin','professor','admin','admin123')
-        """)
+        VALUES('Admin','professor',?,?)
+        """, ("admin", hashed_password))
 
     # Seed QA mapping with common questions
     c.execute("SELECT COUNT(*) FROM qa_mapping")
@@ -114,6 +123,7 @@ def init_db():
 
     conn.commit()
     conn.close()
+
 
 def seed_qa_data(cursor):
     """Seed common theory questions for QA mapping"""
@@ -159,12 +169,13 @@ def seed_qa_data(cursor):
         ("Explain cloud computing in MIS", "MIS", "5", 1),
         ("What is data warehouse?", "MIS", "3", 1),
     ]
-    
+
     for q, subj, unit, mat_id in common_questions:
         cursor.execute("""
         INSERT INTO qa_mapping(question, subject, unit_number, material_id)
         VALUES(?,?,?,?)
         """, (q, subj, unit, mat_id))
+
 
 init_db()
 
@@ -264,10 +275,11 @@ def auth():
                                          temp_role=role, temp_action=original_action)
 
                 try:
+                    hashed_password = generate_password_hash(password)
                     c.execute("""
                     INSERT INTO users(full_name,role,prn,year,subject,username,password)
                     VALUES(?,?,?,?,?,?,?)
-                    """,(full_name,role,prn,year,subject,username,password))
+                    """,(full_name,role,prn,year,subject,username,hashed_password))
                     conn.commit()
                     error = "Account created successfully! You can now sign in with your credentials."
                     session.clear()
@@ -281,12 +293,12 @@ def auth():
 
             elif original_action == "login_step1":
                 c.execute("""
-                SELECT role,full_name FROM users
-                WHERE username=? AND password=?
-                """,(username,password))
+                SELECT role,full_name,password FROM users
+                WHERE username=?
+                """,(username,))
                 user = c.fetchone()
 
-                if user:
+                if user and check_password_hash(user[2], password):
                     session.clear()
                     session["user"] = username
                     session["role"] = user[0]

@@ -1,2 +1,10 @@
 __pycache__/
+*.pyc
+*.pyo
 database.db
+.env
+app.log
+.vs/
+.vscode/
+*.db
+*.log
